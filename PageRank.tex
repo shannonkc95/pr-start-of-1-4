@@ -93,11 +93,13 @@ quotations and paraphrases suitably indicated.}
 \nomenclature[B,06]{$\alpha$}{Scaling parameter $\in$ [0,1]}
 \nomenclature[B,07]{$\textbf{v}^T$}{Personalization vector}
 
-\nomenclature[C,01]{\textbf{L}}{Adjacency Matrix}
-\nomenclature[C,02]{$\textbf{L}^T\textbf{L}$}{Authority Matrix}
-\nomenclature[C,03]{$\textbf{LL}^T$}{Hub Matrix}
-\nomenclature[C,04]{\textbf{x}}{Authority vector}
-\nomenclature[C,05]{\textbf{y}}{Hub vector}
+\nomenclature[C,01]{N}{Neighbourhood graph}
+\nomenclature[C,02]{\textbf{L}}{Adjacency Matrix}
+\nomenclature[C,03]{\textbf{e}}{Rank 1 matrix with unit entries of size [1x\textit{n}]}
+\nomenclature[C,04]{$\textbf{L}^T\textbf{L}$}{Authority Matrix}
+\nomenclature[C,05]{$\textbf{LL}^T$}{Hub Matrix}
+\nomenclature[C,06]{\textbf{x}}{Authority vector}
+\nomenclature[C,07]{\textbf{y}}{Hub vector}
 
 \nomenclature[D,01]{N}{Neighbourhood graph}
 \nomenclature[D,02]{G}{Bipartite undirected graph}
@@ -330,19 +332,28 @@ The power method is useful for solving the PageRank equation as it converges to 
 %--------------------Comparison to other methods of Ranking webpages
 \chapter{Other Methods of Ranking Web Pages}
 
-Whilst PR is the most influential algorithm for ranking webpages, there are many other algorithms that are well known. In this chapter we will discuss two such algorithms, the HITS algorithm which also ranks webpages by popularity \cite{kleinberg1999authoritative}. However HITS differs as it produces two scores for each webpage. HITS has been used in the search engine Ask.com \cite{bonato}. We will also discuss the SALSA algorithm, which incorporates ideas from both HITS and PR, as it assigns two scores to each web pages, but uses Markov theory as in PR \cite{lempel2000stochastic}. 
+Whilst PR is the most influential algorithm for ranking webpages, there are many other algorithms that are well known. In this chapter we will discuss two such algorithms, the HITS algorithm which also ranks webpages by popularity \cite{kleinberg1999authoritative}. However HITS differs as it produces two scores for each webpage. HITS has been used in the search engine Ask.com \cite{bonato}, and expands upon the idea of using connectivity analysis too identify high quality pages within a topic specific graph \cite{manning}. We will also discuss the SALSA algorithm, which incorporates ideas from both HITS and PR, as it assigns two scores to each web pages, but uses Markov theory as in PR \cite{lempel2000stochastic}. 
 
 
 References: \cite{baldi2003modeling}, \cite{bharat1998improved}, \cite{bonato}, \cite{ding2003pagerank}, \cite{farahat2006authority}, \cite{langville}, \cite{manning}, \cite{ng2001link}, \cite{ng2001stable}
 
 \section{HITS Algorithm}
-The Hypertext Induced Topic Search (HITS) algorithm was developed by Jon Kleinburg, and is similar to PR as it ranks web pages by popularity, however HITS produces two popularity scores, for each webpage. The HITS algorithm defines an authoritative page as a page with sources of information on a topic, while a hub is a page that is not in itself a source of information, but compilations to authoritative pages \cite{manning}. Authoritative pages have many inlinks, a hub is a page which has many outlinks, each webpage on a graph has some measure of an authority and some measure of a hub. A good authority is one which is pointed to by good hubs, whilst a good hub is one which points to good authorities. This cyclic definition is similar to the definition for PR, and we use an iterative computation in order to rank the webpages. Authorities are pages with good coverage of a topic, hubs are pages with links to many useful pages on a topic \cite{bonato}. 
+The Hypertext Induced Topic Search (HITS) algorithm was developed by Jon Kleinburg, and is similar to PR as it ranks web pages by popularity, however HITS produces two popularity scores, for each webpage. The HITS algorithm defines an authoritative page as a page with sources of information on a topic, while a hub is a page that is not in itself a source of information, but compilations to authoritative pages \cite{manning}. Authoritative pages have many inlinks, a hub is a page which has many outlinks, each webpage on a graph has some measure of an authority and some measure of a hub. A good authority is one which is pointed to by good hubs, whilst a good hub is one which points to good authorities. This cyclic definition is similar to the definition for PR, and we use an iterative computation in order to rank the webpages.
+
+Authorities are pages with good coverage of a topic, hubs are pages with links to many useful pages on a topic \cite{bonato}. HITS was developed as a way to combat two problems that can occur when ranking webpages, these are the scarcity problem, where not many pages contain the exact information that you desire, and it can be difficult to identify these webpages. The second problem that can occur is the abundance problem, where the number of pages that are returned to the user as being relevant to the query is too much for the human user to digest. The algorithm distils a broad topic down to a representation of a very small size \cite{kleinberg1999authoritative}
 
 \subsection{HITS Implementation}
-The HITS algorithm consists of two steps, the first step builds a neighbourhood graph, N, which is related to the query term, this step is known as the sampling step. The second step, the weight-propagation step, involves the computation of the authority and hub scores for each page, two ranked lists are then presented to the user.  
+The HITS algorithm consists of two steps, the first step builds a neighbourhood graph, N, which is related to the query term, this step is known as the sampling step. The second step, the weight-propagation step, involves the computation of the authority and hub scores for each page, two ranked lists are then presented to the user. This computation is an iterative calculation, where firstly each page is assigned initial authority score $x_i^{(0)}$ and initial hub score $y_i^{(0)}$, which are redefined by computing \begin{equation} \label{eq:HITS1}
+x_i^{(k)} = \displaystyle \sum_{j:e_{ij}\in E} y_j^{(k-1)} \quad\mathrm{and}\quad y_i^{(k)} = \displaystyle \sum_{j:e_{ij}\in E} x_j^{(k)}  \quad\mathrm{for}\quad k=1,2,3\ldots
+\end{equation}
 
-In the sampling step, the algorithm first generates a collection of several thousand web pages which are likely to be relevant to a query, \textit{q}, these web pages form N.
+In the sampling step, the algorithm first uses creates a root set of pages which contain the query, \textit{q}. Next a base set of pages is formed which includes the root set along with any pages which point into the root set, or which are pointed to, %this usually resolves the issue of synonyms along with the issue that good authoritative pages may not contain the query item. 
+This base set can become very large and so in practice a maximum number of inlinking and outlinking pages that are added for a particular node in the root set is fixed, for example at 100. 
 
+The base set is constructed in this manner due to several considerations. Firstly a good authority page may not contain the query term  as there may be synonyms more commonly used, also if the root set contains a good hub set, this expansion means that the base set will then containing good authority pages that it may not have captured previously. The base set then forms the Neighbourhood Graph N, which is then used in the computation of the authority and hub scores for all pages in N.
+
+The first step in the weight-propagation step is the formation of the adjacency matrix \textbf{L}, where \(\textbf{L}_{ij} = \begin{cases} 1, & \textnormal{if there exists an edge from node \textit{i} to node \textit{j}}\\ 0 & \textnormal{otherwise}
+\end{cases}\). If we use the example in Figure \ref{Example}, we are able to generate the following adjacency matrix:
 \begin{equation}
 \textbf{L}=\left(
 \begin{array}{cccccccc}
@@ -357,6 +368,12 @@ In the sampling step, the algorithm first generates a collection of several thou
 \end{array}
 \right)
 \end{equation}
+
+We are able to represent Equations \eqref{eq:HITS1} as \begin{equation}
+\textbf{x}^{(k)} = \textbf{L}^T\textbf{y}^{(k-1)}\quad\mathrm{and}\quad \textbf{y}^{(k)}=\textbf{Lx}^{(k)}
+\end{equation} where \(\textbf{x}^{(k)}\) and \(\textbf{y}^{(k)}\) are \(\textit{n}\) x1 vectors holding the approximate authority and hub scores at each iteration respectively. 
+
+In the original algorithm, 
 \begin{equation}
 \textnormal{Authority matrix} = \textbf{L}^T\textbf{L}=\left(
 \begin{array}{cccccccc}
@@ -394,6 +411,8 @@ Using matlab code as given in Appendix \ref{app:code}, we are able to compute au
 0.062 & 0.144 & 0.120 & 0.226 & 0.037 & 0.185 & 0 & 0.226
 \end{array}\right)
 \end{eqnarray}
+
+As we form \textbf{L} through the base set, the order of \textbf{L} is much smaller then the total number of pages on the web, and so the computation required in producing a ranked list of the web pages is less costly than the computation in PR, we also do not need to compute eigenvectors for both matrices, as we are able to use the equations, which is also computationally simpler.
 \section{SALSA method} \label{sec:SALSA}
 \begin{figure}[H]
 \centering
@@ -609,7 +628,8 @@ When Equation \eqref{weightin} and Equation \eqref{weightout} applied to Figure 
 \end{array}
 \right)	\]
 
-Through the same methods as discussed in chapters 2 and 3, we produce a PageRank vector \[\boldsymbol\pi_{WPR} = \left(
+Through the same methods as discussed in chapters 2 and 3, we produce a PageRank vector 
+\[\boldsymbol\pi_{WPR} = \left(
 \begin{array}{c}
 0.028 \\
 0.028 \\
@@ -1056,8 +1076,8 @@ time=toc;
 
 \end{lstlisting}
 
-\begin{lstlisting} [caption=Matlab code for implementing HITS power method taken from \cite{langville} ]
-function [x,y,time,numiter] = hits[L,x0,n,epsilon]
+\begin{lstlisting} [caption=Matlab code for implementing HITS power method taken from \cite{langville}]
+function [x,y,time,numiter] = hits[L,x0,n,epsilon] 
 
 % HITS computes the HITS authority vector x and hub vector y 
 %      for an n-by-n adjacency matrix L with starting vector
@@ -1096,7 +1116,7 @@ y=y/sum(y);
 numiter=k;
 time=toc;
 
-\end{lstlisting} 
+\end{lstlisting}
 \end{appendices}
 
 
