@@ -336,12 +336,13 @@ Whilst PR is the most influential algorithm for ranking webpages, there are many
 References: \cite{baldi2003modeling}, \cite{bharat1998improved}, \cite{bonato}, \cite{ding2003pagerank}, \cite{farahat2006authority}, \cite{langville}, \cite{manning}, \cite{ng2001link}, \cite{ng2001stable}
 
 \section{HITS Algorithm}
-The Hypertext Induced Topic Search (HITS) algorithm was developed by Jon Kleinburg, and is similar to PR as it ranks web pages by popularity, however HITS produces two popularity scores, for each webpage. An authoritative page is one which has many inlinks, a hub is a page which has many outlinks, each webpage on a graph has some measure of an authority and some measure of a hub. A good authority is one which is pointed to by good hubs, whilst a good hub is one which points to good authorities. This cyclic definition is similar to the definition for PR. Authorities are pages with good coverage of a topic, hubs are pages with links to many useful pages on a topic \cite{bonato}. 
+The Hypertext Induced Topic Search (HITS) algorithm was developed by Jon Kleinburg, and is similar to PR as it ranks web pages by popularity, however HITS produces two popularity scores, for each webpage. The HITS algorithm defines an authoritative page as a page with sources of information on a topic, while a hub is a page that is not in itself a source of information, but compilations to authoritative pages \cite{manning}. Authoritative pages have many inlinks, a hub is a page which has many outlinks, each webpage on a graph has some measure of an authority and some measure of a hub. A good authority is one which is pointed to by good hubs, whilst a good hub is one which points to good authorities. This cyclic definition is similar to the definition for PR, and we use an iterative computation in order to rank the webpages. Authorities are pages with good coverage of a topic, hubs are pages with links to many useful pages on a topic \cite{bonato}. 
 
 \subsection{HITS Implementation}
 The HITS algorithm consists of two steps, the first step builds a neighbourhood graph, N, which is related to the query term, this step is known as the sampling step. The second step, the weight-propagation step, involves the computation of the authority and hub scores for each page, two ranked lists are then presented to the user.  
 
-In the sampling step, the algorithm first generates a collection of several thousand web pages which are likely to be relevant to a query, \textit{q}, these web pages form N. 
+In the sampling step, the algorithm first generates a collection of several thousand web pages which are likely to be relevant to a query, \textit{q}, these web pages form N.
+
 \begin{equation}
 \textbf{L}=\left(
 \begin{array}{cccccccc}
