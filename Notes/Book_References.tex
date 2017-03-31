@@ -1,0 +1,162 @@
+\documentclass[11pt]{report}
+\usepackage[a4paper]{geometry}
+\usepackage{outline}
+\usepackage{pmgraph}
+\usepackage[normalem]{ulem}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{eucal}
+\usepackage{amssymb}
+\usepackage{mathrsfs}
+\begin{document}
+\section{Mining the Web}
+\begin{itemize}
+\item An analysis of a significant portion of the Web graph in 2000 showed it is not strongly connected as a whole, only a fourth is
+\end{itemize}
+\section{Web page ranking using link attributes}
+\begin{itemize}
+\item WLRank - Weighted Links Rank, considers different web page attributes to give more weight to some links
+\item Gives weights to link based on three attributes, relative position in the thread, tag where the link is contained and length of the anchor text
+\item Gives more weight to links that are at beginning of pages
+\end{itemize}
+\section{Improved algorithms for topic distillation}
+\begin{itemize}
+\item Connectivity analysis been shown to be useful in identifying high quality pages within a topic specific graph
+\item Users tend to have short queries
+\item Find documents relevant to topic of search
+\item Finding quality documents on a query topic - topic distillation
+\item If A is seen to point to a lot of good documents, then A becomes more valuable, adn the fact that A points to B would suggest that B is a good document as well
+\item Link to KELINBERG - developed a connectivity analysis algorithm for hyperlinked environments
+\item Three probelms with connectivity analysis
+\begin{enumerate}
+\item Mutually reinforcing relationships between hosts - set of documents on one post point to single document on second host, cand drive up hub scores on first host, and authority on second - undue weight to the opinion of one person
+\item Automatically generated links - Links do not represent human opinion
+\item Non-relevant documents - Topic drift, most highly ranked authorities and hubs tend to not be about original topic
+\end{enumerate} 
+\item General solutions - use content analysis
+\item Hub and aucthority scores done as follows;
+\begin{enumerate}
+\item Let \textit{N} be the set of nodes in the neighbourhood graph
+\item For every node \textit{n} in \textit{N}, let \textit{H[n]} be its hub score and \textit{A[n]} its authority score.
+\item Initialize \textit{H[n]} and \textit{A[n]} to 1 for all \textit{n} in \textit{N}.
+\item While the vectors \textit{H} and \textit{A} have not converged:
+\item For all \textit{n} in \textit{N}, $A[n]:=\sum_{(n',n)\in N} H[n']$
+\item For all \textit{n} in \textit{N}, $H[n]:=\sum_{(n,n')\in N} A[n']$
+\item Normalize the \textit{H} and \textit{A} vectors
+\end{enumerate}
+\item in practice, found that the vectors converge in about 10 iterations
+\item Improves precision over Kleinberg by 45\%
+\item Limited to topics that are well represented and well connected on the Web
+\item Assumes that results of a SE define a good start set
+\item Topic drift can be avoided by using topic vecotrs to filter the expanded subgraph - topic vector is a term vector computer from the text of pages in the seed set, a page is allowed to remain in the extended graph only if its term vector is a good match for this topic vector
+\end{itemize}
+\section{The Term Vector Database: fast access to indexing terms for Web pages}
+\begin{itemize}
+\item Built term vector database
+\end{itemize}
+\section{The Intelligent Surfer:
+Probabilistic Combination of Link and
+Content Information in PageRank}
+\begin{itemize}
+\item Improve PageRank by using a more intelligent surfer - guided by a probabilistic model of the relevance of a page to a query
+\item Algorithm outperforms PageRank in human rated quality of pages returned, remianing efficient enough to be used in large SE
+\item 'PageRank rates a page highly if it is at the center of a large sub-web'
+\item However best pages should be those at the centre but also relevant
+\item Does most of computation at crawl time
+\item Algorithm closer to what a human would do, jumps preferentially to pages containing query terms
+\item Can be viewed as solution to problem of topic drift
+\item Resulting probability distribution over pages is \begin{equation}
+P_q(j)=(1-\alpha)P_q'(j)+\alpha\sum_{i\in B_j}P_q(i)P_q(i\rightarrow j)
+\end{equation} where $P_q(i\rightarrow j)$ is the probability that the surfer transitions to page \textit{j} given that he is on page \textit{i} and searching for query \textit{q}, $P_q'(j)$ specifies where the surfer chooses to jump when not following links, $P_q(j)$ is the resulting probability distribution over pages and corresponds to the query-dependent PageRank score
+\item When choosing among multiple out-links, the directed surfer tends to follow those which lead to pages whose content has been deemed relevant to the query
+\item SE cannot perform computation at query time, when expected to return results in seconds
+\item Pre computing individual term rankings and combing at query time, computation and storage required for QD PageRank, hundred of thousands of words is only approximately 100-200 times that of normal PageRank
+\end{itemize}
+\section{A new paradigm for ranking pages on the world wide web}
+\begin{itemize}
+\item Using a method of entropy maximisation
+\item Constructed on a large scale 
+\end{itemize}
+\section{Efficient Computation of PageRank}
+\begin{itemize}
+\item Applying biases during iterations to increase the importance of certain categories and pages
+\item Efficient version of algorithm which lowers main memory requirements
+\item As few as 10 iterations required
+\item Useful PageRank vector in roughly an hour
+\end{itemize}
+\section{Topic Sensitive PageRank}
+\begin{itemize}
+\item Set of PageRank vectors biased using a set of representative topics
+\item Generate more accurate rankings than with a single, generic PageRank vector
+\item Like HITS allows the query to influence the link-based score, but requires minimal query-time processing like PageRank
+\item Personalization
+\item Biasing involves introducing artificial links into the Web graph during the off-line rank computation
+\item By making PageRank topic-sensitive, we avoid the problem of heavily linked pages getting highly ranked for queries where they have no particular authority
+\item Small number of representative basis topics
+\item Context can come from user who submitted query - bookmarks and browser history
+\item During offline crawl, 16 topic-sensitive PageRank vectors 
+\item At query time, calculate similarity of query (and if available, the query or user context) to each of these topics
+\item Take linear combination of topic-sensitive vectors weighted using the similarities of the query (and context) to the topic
+\item Link-based computations are performed offline, the query-time costs are not much greater
+\item Topics - Arts, Business, Computers, Games, Health, Home, Kids \& Teens, News, Recreation, Reference, Regional, Science, Shopping, Society, Sports, World
+\end{itemize}
+\section{Modelling the Web and the computation of PageRank}
+\begin{itemize}
+\item Perron-Frobenius theorem that a positive, stochastic, irreducible matrix is guaranteed to have a positive eigenvector
+\item Weakness of PageRank - web contains so many documents that calculations must be completed on many computers
+\item Structure and content of the web changes daily - monthly updating though
+\item Personalized PageRank costly in implementation, allowed bias against link farms
+\item Pages with lover PageRank tend to converge very quickly compared to pages with higher PageRank
+\end{itemize}
+\section{Authoritative sources in a hyperlinked environment}
+\begin{itemize}
+\item Specific queries, broad-topic queries, similar-page queries
+\item Scarcity problem - not many pages have the exact info you desire, and often difficult to identify these pages
+\item Abundance problem - number of pages that could be returned as relevant is too much for a human user to digest
+\item Need to distil a broad topic down to a representation of very small size
+\end{itemize}
+\section{PageRank, HITS, and a unified framework for Link analysis}
+\begin{itemize}
+\item HITS emphasises mutual reinforcement between authority and hub web pages
+\item PageRank emphasizes hyper link weight normalisation and web surfing based on random walk models 
+\end{itemize}
+\section{Link Analysis, eigenvectors and stability}
+\begin{itemize}
+\item It is worth noting that HITS is typically described as running on a small collection of articles (say retrieved in response to a query), while PageRank is described in terms of the entire web
+\end{itemize}
+\section{The stochastic approach for link-structure analysis (SALSA) and the TKC effect}
+\begin{itemize}
+\item Examines random walks on graphs derived from link structure
+\item Computationally more efficient that the mutual reinforcement
+\item TKC effect - Tightly Knitted Community
+\begin{itemize}
+\item TKC effect can derail the mutual reinforcement approach
+\item Occurs when a community scores high in link analysing algorithms but have no authority on the topic, or just pertain to one aspect of the topic
+\end{itemize}
+\item Examines walks on two different Markov Chains which are derived from the link structure of the WWW, Authority chain and hub chain
+\item Authorities correspond to the sites that are most frequently visited by the random walk defined by the the authority Markov Chain
+\item SALSA less vulnerable to the TKC effect
+\end{itemize}
+\section{Authority rankings from HITS, PageRank and SALSA}
+\begin{itemize}
+\item HITS and SALSA eigenvectors need not be unique, PageRank does
+\item SALSA can give inconsistent hub and authority weights due to non-uniqueness
+\item HITS and SALSA can behave unexpectedly on certain graphs - output can depend on initial seed vector, output of HITS can depend on whether the implementation uses initial authority or hub vector
+\item Authority and hub vectors produced by SALSA can be inconsistent
+\item PageRank doesn't display this behaviour
+\end{itemize}
+\section{Modelling the internet and the web}
+\subsection{HITS}
+\begin{itemize}
+\item Computes a pair of scoring values associated with hypertext documents
+\item Subgraph of interest is computed by selecting the neighbours of a root set of web pages relevant to the topic
+\item Children of a given node are forward links and can be obtained directly from v
+\item Parents of a node correspond to backlinks
+\item Bounding number of parents is crucial in practical applications
+\item The authority weight of a page is the sum of the hubness weights of its parents
+\item The hubness weight of a page is the sum of the authority weights of its children
+\item \textbf{BHARAT and HERZINGER} suggested improved version of HITS, modified by assigning weight to these multiple edges that are inversely proportional to their multiplicity
+\end{itemize}
+\end{document}
